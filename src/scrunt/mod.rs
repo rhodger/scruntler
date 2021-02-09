@@ -1,4 +1,5 @@
 use serde_json::{json, Value, Error};
+use rand::seq::SliceRandom;
 
 const API_KEY: &str = "6bd06c2e-4141-4ebc-a8ae-a5221f45ecca";
 
@@ -59,7 +60,7 @@ impl Scrunt {
             for i in 0..split.len() {
                 if *self.pattern.get(i).unwrap() {
                     if let Ok(alts) = get_synonyms(split[i]) {
-                        output = format!("{} {}", output, alts[0]);
+                        output = format!("{} {}", output, alts.choose(&mut rand::thread_rng()).expect("Something wrong with the randomness"));
                     } else {
                         return Err("Could not find synonyms for a word");
                     }
@@ -91,10 +92,11 @@ impl Scrunt {
         if self.scrunted_sentence.is_some() {
             return self.scrunted_sentence.as_ref().unwrap().to_string();
         } else {
-            if self.scrunt().is_ok() {
+            let scrunted = self.scrunt();
+            if scrunted.is_ok() {
                 return self.get_scrunted();
             } else {
-                panic!("This shouldn't happen");
+                panic!("Scrunting proved impossible");
             }
         }
     }
