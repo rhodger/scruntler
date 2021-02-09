@@ -23,12 +23,11 @@ impl Game {
 
     pub fn add_random(&mut self) {
         let sentence = "let us throw caution to the wind";
-        let mut pattern = Vec::<bool>::new();
-        for i in &[false, false, true, true, false, false, true] {
-            pattern.push(*i);
+        if let Ok(pattern) = Scrunt::convert("false false true true false false true"){
+            self.scrunts.push(Scrunt::new(sentence, pattern));
+        } else {
+            // Didn't work; throw error?
         }
-
-        self.scrunts.push(Scrunt::new(sentence, pattern));
     }
 
     pub fn get_sentence(&mut self) -> (String, String) {
@@ -73,6 +72,19 @@ impl Scrunt {
         self.scrunted_sentence = Some(output.to_string());
 
         return Ok(());
+    }
+
+    fn convert(str_pattern: &str) -> Result<Vec<bool>, &'static str> {
+        let mut bool_pattern = Vec::<bool>::new();
+        for i in str_pattern.split(" ") {
+            match i {
+                "true" => bool_pattern.push(true),
+                "false" => bool_pattern.push(false),
+                _ => return Err("Bad pattern"),
+            }
+        }
+        
+        return Ok(bool_pattern);
     }
 
     pub fn get_scrunted(&mut self) -> String {
